@@ -100,8 +100,8 @@ def init_routes(app):
         # Uncommenting this will trigger CWE-798 (Hardcoded Secrets) and CWE-94 (Code Injection)
         # =========================================================================
         # SECRET_API_KEY = "12345-SUPER-SECRET-DEV-KEY"
-        user_input = data.get('command', 'print("No command")')
-        exec(user_input)
+        # user_input = data.get('command', 'print("No command")')
+        # exec(user_input)
 
         new_note = {
             "id": len(notes) + 1,
