@@ -9,7 +9,7 @@
 #     print(f"Executing: {user_input}")
     
 #     # Intentional vulnerability
-    eval(user_input)  # nosec B307
+#     eval(user_input)  # nosec B307
 
 # if __name__ == "__main__":
 #     execute_user_command('print("Hello DevSecOps!")')
