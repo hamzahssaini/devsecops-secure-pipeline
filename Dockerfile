@@ -1,5 +1,5 @@
-# FROM python:3.11-slim
-FROM python:3.8 
+# Intentionally using an old, highly vulnerable image to test Trivy
+FROM python:3.9.0-slim 
 # Set environment variables
 # PYTHONDONTWRITEBYTECODE prevents Python from writing .pyc files to disk
 # PYTHONUNBUFFERED prevents Python from buffering stdout and stderr
