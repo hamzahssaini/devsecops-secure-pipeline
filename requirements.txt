@@ -1,0 +1,4 @@
+Flask==3.0.0
+Werkzeug==3.0.1
+# VULNERABLE DEPENDENCY FOR DEMO (uncomment to test pip-audit/safety scanners):
+# requests==2.20.0

@@ -1,0 +1,19 @@
+# INSECURE DOCKERFILE FOR DEMO PURPOSES
+# DO NOT USE IN PRODUCTION
+
+# Using an outdated, full-sized image with known vulnerabilities
+FROM python:3.8 
+
+# Running as root (No user mapping)
+WORKDIR /app
+
+# Copying everything, which might include secrets, .git folder, etc.
+COPY . .
+
+# Installing without pinning or checking cache
+RUN pip install Flask==2.0.0 requests==2.20.0
+
+# Exposing port but running as root
+EXPOSE 5000
+
+CMD ["python", "app/main.py"]

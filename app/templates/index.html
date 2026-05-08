@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSecOps Secure Pipeline Dashboard</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #151b2b;
+            --bg-card-hover: #1c2336;
+            --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.4);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.4);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.4);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hero Header */
+        .hero-header {
+            background: radial-gradient(circle at top, rgba(59, 130, 246, 0.15) 0%, rgba(11, 15, 25, 1) 70%);
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Modern Cards */
+        .dash-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dash-card:hover {
+            background-color: var(--bg-card-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dynamic Borders for security metrics */
+        .dash-card.metric-success { border-bottom: 3px solid var(--success); }
+        .dash-card.metric-success:hover { box-shadow: 0 10px 30px var(--success-glow); }
+        .dash-card.metric-danger { border-bottom: 3px solid var(--danger); }
+        .dash-card.metric-danger:hover { box-shadow: 0 10px 30px var(--danger-glow); }
+        .dash-card.metric-warning { border-bottom: 3px solid var(--warning); }
+        .dash-card.metric-warning:hover { box-shadow: 0 10px 30px var(--warning-glow); }
+
+        /* Custom Inputs */
+        .form-control {
+            background-color: #0b0f19;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            background-color: #0b0f19;
+            border-color: var(--accent-primary);
+            color: var(--text-main);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* Buttons */
+        .btn-modern {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child { padding-bottom: 0; }
+
+        .timeline-icon {
+            position: absolute;
+            left: -2rem;
+            top: 0.15rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            box-shadow: 0 0 0 4px var(--bg-card);
+        }
+
+        .icon-success { background-color: var(--success); box-shadow: 0 0 15px var(--success-glow), 0 0 0 4px var(--bg-card); }
+        .icon-danger { background-color: var(--danger); box-shadow: 0 0 15px var(--danger-glow), 0 0 0 4px var(--bg-card); }
+        .icon-warning { background-color: var(--warning); box-shadow: 0 0 15px var(--warning-glow), 0 0 0 4px var(--bg-card); }
+        .icon-primary { background-color: var(--accent-primary); box-shadow: 0 0 15px var(--accent-glow), 0 0 0 4px var(--bg-card); }
+
+        /* Status Badge Pulse */
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: 0 0 10px var(--success-glow);
+        }
+        
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Note Layout */
+        .note-card {
+            border-left: 3px solid var(--accent-primary);
+        }
+        
+        /* Loading overlay */
+        #loading {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Header -->
+    <header class="hero-header pt-5 pb-4 mb-4">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h1 class="display-6 fw-bold mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-check text-primary"></i> 
+                        DevSecOps Secure Pipeline
+                    </h1>
+                    <p class="text-muted mb-0">CI/CD Security Automation & Dynamic Asset Management</p>
+                </div>
+                <div>
+                    <div class="live-badge">
+                        <div class="pulse-dot"></div>
+                        SYSTEM ACTIVE
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mb-5">
+        
+        <!-- Security Metrics Row -->
+        <h5 class="text-uppercase text-muted fw-bold mb-3 ms-1" style="font-size: 0.8rem; letter-spacing: 1px;">Security Scan Results</h5>
+        <div class="row g-4 mb-5">
+            <!-- Secret Scanning -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="dash-card metric-success p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="text-muted small fw-semibold">Gitleaks Secrets</div>
+                        <i class="bi bi-key fs-4 text-success"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">0</h3>
+                    <div class="text-success small d-flex align-items-center gap-1">
+                        <i class="bi bi-check-circle-fill"></i> Passed
+                    </div>
+                </div>
+            </div>
+            <!-- SAST -->
+            <div class="col-sm-6 col-lg-3">
+                <div id="sast-card" class="dash-card metric-danger p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="text-muted small fw-semibold">Bandit SAST</div>
+                        <i id="sast-icon" class="bi bi-code-slash fs-4 text-danger"></i>
+                    </div>
+                    <h3 id="sast-count" class="fw-bold mb-1">2</h3>
+                    <div id="sast-msg-container" class="text-danger small d-flex align-items-center gap-1">
+                        <i id="sast-msg-icon" class="bi bi-exclamation-triangle-fill"></i> <span id="sast-msg">Intentionally Vulnerable</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Dependency Scan -->
+            <div class="col-sm-6 col-lg-3">
+                <div id="dep-card" class="dash-card metric-warning p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="text-muted small fw-semibold">Safety / Pip-Audit</div>
+                        <i id="dep-icon" class="bi bi-plugin fs-4 text-warning"></i>
+                    </div>
+                    <h3 id="dep-count" class="fw-bold mb-1">1</h3>
+                    <div id="dep-msg-container" class="text-warning small d-flex align-items-center gap-1">
+                        <i id="dep-msg-icon" class="bi bi-info-circle-fill"></i> <span id="dep-msg">Commented Vulnerability</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Docker Scan -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="dash-card metric-success p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="text-muted small fw-semibold">Trivy Image Scan</div>
+                        <i class="bi bi-box-seam fs-4 text-success"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Clean</h3>
+                    <div class="text-success small d-flex align-items-center gap-1">
+                        <i class="bi bi-check-circle-fill"></i> Non-Root Verified
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="row g-4">
+            
+            <!-- Left Column: Notes Section -->
+            <div class="col-lg-8">
+                <!-- Add Form -->
+                <div class="dash-card p-4 mb-4">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-journal-plus text-primary"></i> Create Deployment Note
+                    </h5>
+                    <form id="noteForm">
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <label for="title" class="form-label text-muted small">Asset Title</label>
+                                <input type="text" class="form-control" id="title" required placeholder="e.g. v1.0.4 hotfix">
+                            </div>
+                            <div class="col-md-7">
+                                <label for="content" class="form-label text-muted small">Deployment Details</label>
+                                <textarea class="form-control" id="content" rows="1" required placeholder="Describe changes..."></textarea>
+                            </div>
+                            <div class="col-12 mt-3 text-end">
+                                <button type="submit" class="btn btn-modern fw-semibold shadow-sm text-white" id="submitBtn">
+                                    <i class="bi bi-send me-1"></i> Deploy Note
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Notes List -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold m-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-hdd-network text-primary"></i> Active Assets
+                    </h5>
+                    <div id="loading" class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                
+                <div id="notesContainer" class="d-flex flex-column gap-3">
+                    <!-- Notes injected here -->
+                    <div class="text-muted small">Initializing connection...</div>
+                </div>
+            </div>
+
+            <!-- Right Column: Pipeline Activity Timeline -->
+            <div class="col-lg-4">
+                <div class="dash-card p-4 h-100">
+                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-activity text-primary"></i> Pipeline Activity
+                    </h5>
+                    
+                    <div class="timeline">
+                        <!-- Simulate CI/CD events -->
+                        <div class="timeline-item">
+                            <div class="timeline-icon icon-success"><i class="bi bi-check"></i></div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 fw-semibold">Deploy to Staging</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">Just now</small>
+                            </div>
+                            <p class="text-muted small mb-0">Container successfully deployed to cluster.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon icon-primary"><i class="bi bi-box"></i></div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 fw-semibold">Docker Build</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">2m ago</small>
+                            </div>
+                            <p class="text-muted small mb-0">Image built and tagged as devsecops-demo-api:latest.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon icon-danger"><i class="bi bi-x"></i></div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 fw-semibold">SAST Scan Failed</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">4m ago</small>
+                            </div>
+                            <p class="text-muted small mb-0">Bandit detected <strong>CWE-798</strong> and <strong>CWE-94</strong> in app/routes.py. Execution halted in prod branch.</p>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon icon-warning"><i class="bi bi-exclamation"></i></div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 fw-semibold">SCA Dependency Check</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">5m ago</small>
+                            </div>
+                            <p class="text-muted small mb-0">Found vulnerable package 'requests==2.20.0' in requirements.txt.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon icon-success"><i class="bi bi-git"></i></div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h6 class="mb-0 fw-semibold">Git Push</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">6m ago</small>
+                            </div>
+                            <p class="text-muted small mb-0">Triggered pipeline from branch 'feature/demo'.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        const notesContainer = document.getElementById('notesContainer');
+        const noteForm = document.getElementById('noteForm');
+        const loadingElement = document.getElementById('loading');
+
+        // Dynamically update Metric Cards based on real backend data
+        async function fetchMetrics() {
+            try {
+                const res = await fetch('/metrics');
+                if(!res.ok) return;
+                const data = await res.json();
+
+                // Update Dependency (SCA) Card
+                const depCard = document.getElementById('dep-card');
+                const depIcon = document.getElementById('dep-icon');
+                const depCount = document.getElementById('dep-count');
+                const depMsgContainer = document.getElementById('dep-msg-container');
+                const depMsgIcon = document.getElementById('dep-msg-icon');
+                const depMsg = document.getElementById('dep-msg');
+
+                // Clear previous classes
+                depCard.className = 'dash-card p-4 h-100 metric-' + data.dependency.status;
+                depIcon.className = 'bi bi-plugin fs-4 text-' + (data.dependency.status === 'danger' ? 'danger' : data.dependency.status === 'warning' ? 'warning' : 'success');
+                depCount.innerText = data.dependency.count;
+                depMsgContainer.className = 'small d-flex align-items-center gap-1 text-' + (data.dependency.status === 'danger' ? 'danger' : data.dependency.status === 'warning' ? 'warning' : 'success');
+                depMsgIcon.className = data.dependency.status === 'success' ? 'bi bi-check-circle-fill' : (data.dependency.status === 'warning' ? 'bi bi-info-circle-fill' : 'bi bi-exclamation-triangle-fill');
+                depMsg.innerText = data.dependency.message;
+
+                // Update SAST Card
+                const sastCard = document.getElementById('sast-card');
+                const sastIcon = document.getElementById('sast-icon');
+                const sastCount = document.getElementById('sast-count');
+                const sastMsgContainer = document.getElementById('sast-msg-container');
+                const sastMsgIcon = document.getElementById('sast-msg-icon');
+                const sastMsg = document.getElementById('sast-msg');
+
+                // Clear previous classes
+                sastCard.className = 'dash-card p-4 h-100 metric-' + data.sast.status;
+                sastIcon.className = 'bi bi-code-slash fs-4 text-' + (data.sast.status === 'danger' ? 'danger' : data.sast.status === 'warning' ? 'warning' : 'success');
+                sastCount.innerText = data.sast.count;
+                sastMsgContainer.className = 'small d-flex align-items-center gap-1 text-' + (data.sast.status === 'danger' ? 'danger' : data.sast.status === 'warning' ? 'warning' : 'success');
+                sastMsgIcon.className = data.sast.status === 'success' ? 'bi bi-check-circle-fill' : (data.sast.status === 'warning' ? 'bi bi-info-circle-fill' : 'bi bi-exclamation-triangle-fill');
+                sastMsg.innerText = data.sast.message;
+                
+            } catch (err) {
+                console.error("Failed to load live metrics:", err);
+            }
+        }
+
+        // Fetch / Display
+        async function fetchNotes() {
+            try {
+                loadingElement.style.display = 'block';
+                const response = await fetch('/notes');
+                const data = await response.json();
+                
+                notesContainer.innerHTML = ''; 
+                
+                if (data.notes && data.notes.length > 0) {
+                    data.notes.forEach(note => {
+                        const noteCard = document.createElement('div');
+                        noteCard.className = 'dash-card note-card p-3';
+                        noteCard.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold text-white mb-0">${note.title}</h6>
+                                <span class="badge bg-secondary bg-opacity-25 text-light border border-secondary rounded-pill" style="font-size: 0.7rem;">ID-${note.id}</span>
+                            </div>
+                            <p class="text-muted small mb-0">${note.content}</p>
+                        `;
+                        notesContainer.appendChild(noteCard);
+                    });
+                } else {
+                    notesContainer.innerHTML = '<div class="text-muted small p-3 dash-card text-center">No active assets registered.</div>';
+                }
+            } catch (error) {
+                console.error('Error fetching notes:', error);
+                notesContainer.innerHTML = '<div class="alert alert-danger dash-card border-danger text-danger">Connection lost to API layer.</div>';
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+
+        // Handle Submission
+        noteForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnText = submitBtn.innerHTML;
+
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Deploying...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+
+                if (response.ok) {
+                    noteForm.reset();
+                    await fetchNotes(); 
+                } else {
+                    alert("Pipeline deployment failed.");
+                }
+            } catch (error) {
+                console.error('Error saving:', error);
+                alert("API Error.");
+            } finally {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchNotes();
+            fetchMetrics();
+            
+            // Poll for live metrics every 5 seconds to make the UI "live/real-time" during the demo
+            setInterval(fetchMetrics, 3000); 
+        });
+    </script>
+</body>
+</html>
