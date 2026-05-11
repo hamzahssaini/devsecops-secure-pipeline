@@ -1,38 +1,64 @@
-# 🛡️ Enterprise DevSecOps Pipeline
+# Enterprise DevSecOps Pipeline Architecture 🛡️
 
-Welcome to the **Enterprise DevSecOps Pipeline**! This project demonstrates a production-grade secure CI/CD pipeline leveraging GitHub Actions. It enforces the 'Shift-Left' security paradigm by automatically detecting vulnerabilities, hardcoded secrets, and vulnerable dependencies *before* they are merged into the main codebase.
+![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=githubactions)
+![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
+![Security](https://img.shields.io/badge/Security-A+-success?style=for-the-badge&logo=security)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)
 
-## 🚀 Features & Security Stages
+## Executive Summary
+This repository serves as a comprehensive demonstration of a modern **Enterprise DevSecOps Pipeline**. It showcases the practical implementation of the "Shift-Left" security philosophy by integrating rigorous automated security checks directly into the Continuous Integration and Continuous Deployment (CI/CD) workflow. 
 
-Our pipeline consists of 4 strict security gates:
-
-1. **Secret Scanning (TruffleHog)** 🐷🔑
-   - Scans commits for hardcoded secrets, API keys, and passwords.
-   - *Example:* Blocks exposed Slack tokens or AWS credentials.
-2. **Static Application Security Testing (Bandit)** 🔍
-   - Analyzes Python source code syntax for security flaws.
-   - *Example:* Catches exec() usage or insecure network bindings (0.0.0.0).
-3. **Software Composition Analysis (pip-audit)** 📦
-   - Scans requirements.txt for dependencies with known CVE vulnerabilities.
-4. **Container Image Scanning (Trivy)** 🐳
-   - Scans the generated Docker image for OS-level and application vulnerabilities.
-
-## 📂 Project Structure
-- \pp/\: The core Python Flask application demonstrating intentional vulnerabilities to test the scanners.
-- \.github/workflows/\: Contains the CI/CD pipeline definitions (\devsecops-pipeline.yml\).
-- \docs/\: Professional reports and presentations documenting the pipeline architecture and testing scenarios.
-- equirements.txt\: Python package dependencies.
-- \Dockerfile\: Containerization instructions format.
-
-## 🛠️ Usage & Demo
-
-If you want to trigger the pipeline failures to see the security tools in action:
-1. **Trigger TruffleHog:** Uncomment a Fake PostgreSQL database URI or Slack Token in \pp/routes.py\.
-2. **Trigger Bandit:** Remove the \# nosec B104\ comment from \pp/main.py\.
-3. **Trigger pip-audit:** Add an outdated version of a package like equests==2.19.0\ to equirements.txt\.
-
-## 📖 Documentation
-Check out the \/docs\ folder for an in-depth **[LinkedIn-Ready Report](docs/REPORT.md)** and a **[Presentation Deck](docs/PRESENTATION.md)** covering the business value of this DevSecOps implementation!
+By enforcing strict quality and security gates, this pipeline ensures that no secrets, vulnerable code, or insecure dependencies reach production.
 
 ---
-*Built with Security in Mind 🔒*
+
+## 🏗️ Pipeline Architecture
+
+The pipeline is orchestrated via **GitHub Actions** and enforces mandatory verification across four critical security domains:
+
+\\mermaid
+graph LR
+    A[Developer Commits] --> B{Push Protection}
+    B -->|Blocked| Z[Secret Detected]
+    B -->|Passed| C(GitHub Actions CI)
+    
+    subalign CI Pipeline
+    C --> D[1. Secret Scanning<br>TruffleHog]
+    D --> E[2. SAST<br>Bandit]
+    E --> F[3. SCA<br>pip-audit]
+    F --> G[4. Container Scan<br>Trivy]
+    end
+    
+    G --> H((Secure Deploy))
+\
+---
+
+## ⚙️ Security Integration Matrix
+
+| Stage | Security Tool | Purpose | Threat Mitigated (CWE/OWASP) |
+|---|---|---|---|
+| **Pre-Commit** | *GitHub Push Protection* | Blocks active tokens from remote history | Sensitive Data Exposure |
+| **1. Secret Scan** | **TruffleHog** | Deep repository scan for hardcoded credentials | CWE-798: Hardcoded Credentials |
+| **2. SAST** | **Bandit** | Static analysis of Python AST | CWE-605, CWE-94 (Insecure Coding) |
+| **3. SCA** | **pip-audit** | Software Composition Analysis | OWASP A06: Vulnerable Components |
+| **4. Image Scan** | **Trivy** | Evaluates Docker image OS layers | Zero-day Infrastructure Vulnerabilities |
+
+---
+
+## 🚀 Demonstration Guide
+
+This repository contains intentional flaws commented out to demonstrate the efficacy of the pipeline. To experience the security gates in action:
+
+1. **Test Secret Scanning (TruffleHog):** 
+   Uncomment the \DATABASE_URL\ string containing a credential in \pp/routes.py\.
+2. **Test SAST (Bandit):** 
+   Remove the \# nosec B104\ directive from the Flask \pp.run\ command in \pp/main.py\.
+3. **Test SCA (pip-audit):** 
+   Add equests==2.19.0\ to equirements.txt\.
+
+---
+
+## 📊 Comprehensive Documentation
+For a deep dive into the business value, ROI, and technical specifics of this DevSecOps implementation, please refer to our internal documentation:
+* [📖 High-Level Technical Report](docs/REPORT.md)
+* [📊 Executive Presentation Deck](docs/PRESENTATION.md)
