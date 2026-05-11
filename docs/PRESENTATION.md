@@ -1,56 +1,66 @@
-# DevSecOps Pipeline Showcase - Presentation
+# Enterprise DevSecOps Pipeline Showcase
 
 ## Slide 1: Title Screen
-**Title:** Shifting Security Left: An Enterprise DevSecOps Implementation
+**Title:** Zero-Trust DevSecOps: Implementing a Shift-Left Security Model
 **Speaker:** Hamza
-**Goal:** Demonstrate an automated CI/CD pipeline featuring Secret Scanning, SAST, SCA, and Container Vulnerability Scanning.
+**Goal:** Demonstrate an automated CI/CD pipeline featuring advanced Secret Scanning, SAST, Supply Chain Security (SCA), and Container Vulnerability Scanning.
 
 ---
 
-## Slide 2: Why DevSecOps?
-- **The Problem:** Traditional security happens at the *end* of the pipeline. Finding a flaw late means costly delays.
-- **The Solution:** "Shift-Left" - Move security checks directly into developer workflows (Code Push).
-- **The Workflow:** GitHub Actions tests the code simultaneously for bugs **and** vulnerabilities.
+## Slide 2: The Shift-Left Security Model
+- **The Core Issue:** Traditional security checks happen at the end of the SDLC. Finding a critical flaw late results in expensive friction and severe delays.
+- **The DevSecOps Solution:** "Shift-Left" - We enforce security gates programmatically during the developer workflow (on push).
+- **The Execution:** Our automated GitHub Actions runner evaluates code concurrently for business logic and active security flaws.
 
 ---
 
-## Slide 3: Project Architecture
-*(Show the Mermaid Architecture Diagram here)*
-- Developer pushes code to GitHub.
-- 4 Parallel/Sequential Gates perform security triage.
-- Only a 100% clean build generates a secure Docker image limit.
+## Slide 3: Pipeline Architecture
+*(Refer to the System Architecture Diagram)*
+- Developer triggers the pipeline via GitHub Push.
+- 4 Parallel/Sequential Gates operate as Zero-Trust checkpoints.
+- The pipeline yields a deployment artifact ONLY upon a flawless execution state.
+
+> **[📸 SCREENSHOT 1: Insert an image of the GitHub Actions Graph showing all pipeline stages passing successfully here]**
 
 ---
 
-## Slide 4: Scenario 1 - Secret Scanning (TruffleHog)
-- **Concept:** Developers accidentally commit cloud API keys or passwords.
-- **Red Demo:** Show `demos/fake_keys.py` containing a Stripe API Key. Show TruffleHog failing the build.
-- **The Fix:** Remove the hardcoded keyword. Show TruffleHog passing. 
+## Slide 4: Real-World Scenario 1: Entropy & Regex Secret Scanning (TruffleHog)
+- **Concept:** Accidental credential leaks inside codebases.
+- **The Push Protection Block:** GitHub blocked our standard test PATs from even being pushed. To validate our pipeline, we engineered a bypass using **Slack Tokens** and **PostgreSQL Database URIs**.
+- **The Result:** TruffleHog's Entropy and Regex Engines successfully parsed the commits and intercepted the credentials, blocking the build immediately.
+
+> **[📸 SCREENSHOT 2: Insert an image highlighting TruffleHog catching the Slack Token or PostgreSQL URI here]**
 
 ---
 
-## Slide 5: Scenario 2 - SAST (Bandit)
-- **Concept:** Static Code Analysis. Finding structural logic flaws in Python.
-- **Red Demo:** Show `eval(user_input)` or `SECRET_API_KEY` assignments. Show Bandit aborting the build for `CWE-94 / CWE-259`.
-- **The Fix:** Explain how `# nosec` is used to allow intentional exceptions (like Docker `0.0.0.0`), while enforcing secure coding practices.
+## Slide 5: Real-World Scenario 2: SAST & Actionable Suppressions (Bandit)
+- **Concept:** Static Code Analysis identifying structural flaws like Injection vectors.
+- **The Bandit B104 Fix:** Bandit correctly flagged `0.0.0.0` (CWE-605) as an overly permissive bind. 
+- **The Engineering Fix:** Because this is required for **Docker port mapping**, we intentionally utilized `# nosec B104` to suppress the false positive. This demonstrated an understanding of contextual security versus blind rule enforcement.
+
+> **[📸 SCREENSHOT 3: Insert an image showing Bandit failing the build without the fix, or the `# nosec B104` code block here]**
 
 ---
 
-## Slide 6: Scenario 3 - SCA (pip-audit)
-- **Concept:** Checking 3rd party Open-Source vulnerabilities.
-- **Red Demo:** Change `requirements.txt` to use Flask 3.0.0. Show pip-audit alerting that CVEs exist.
-- **The Fix:** Upgrade to Flask `3.1.3` and Werkzeug `3.1.6`. Prove the vulnerabilities disappear.
+## Slide 6: Scenario 3: Supply Chain Security (pip-audit)
+- **Concept:** Securing the software supply chain against inherited 3rd-party vulnerabilities.
+- **The Issue:** Transitive dependencies carrying critical CVEs (e.g., outdated Flask or Werkzeug versions).
+- **The Fix:** Integrated Actionable SCA to block the build upon discovering known Common Vulnerabilities and Exposures (CVEs), enforcing patched dependency lockfiles.
+
+> **[📸 SCREENSHOT 4: Insert an image showing pip-audit detecting a CVE in the requirements.txt action step here]**
 
 ---
 
-## Slide 7: Scenario 4 - Container Scans (Trivy)
-- **Concept:** The OS layer inside our Docker Container must be patched.
-- **Red Demo:** Downgrade the Docker base image to `python:3.9.0-slim` (a 2020 image). Show Trivy identifying critical debian OS CVEs.
-- **The Fix:** Move to a modern, patched image `python:3.11-slim`. Shows Trivy returning **0 Vulnerabilities**.
+## Slide 7: Scenario 4: Container and OS Scanning (Trivy)
+- **Concept:** Securing the underlying container orchestration and patching OS-level vulnerabilities.
+- **The Issue:** Attempting to build using a severely outdated, unpatched base image (like `python:3.9.0-slim`).
+- **The Fix:** Trivy intercepts the pipeline, alerting us to critical debian OS CVEs. The solution enforces upgrading to modern, patched images like `python:3.11-slim`.
+
+> **[📸 SCREENSHOT 5: Insert an image showing Trivy returning its critical container vulnerability payload here]**
 
 ---
 
 ## Slide 8: Conclusion
 - **Result:** Complete defensive automation.
-- **Impact:** Decreased risk of deployment vulnerabilities, automated enforcement of coding standards.
+- **Impact:** Decreased risk of deployment vulnerabilities, automated enforcement of secure coding standards, and verifiable Zero-Trust delivery.
 - **Q&A**
