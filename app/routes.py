@@ -100,9 +100,9 @@ def init_routes(app):
         # Uncommenting this will trigger CWE-798 (Hardcoded Secrets) and CWE-94 (Code Injection)
         # =========================================================================
         # SECRET_API_KEY = "AKIAIOSFODNN7EXAMPLE"
-        DATABASE_URL = "postgres://superadmin:MyUltraSecretPassword123456!@database.aws.com:5432/mydb"
-        # user_input = data.get('command', 'print("No command")')
-        # exec(user_input)
+        #DATABASE_URL = "postgres://superadmin:MyUltraSecretPassword123456!@database.aws.com:5432/mydb"
+        user_input = data.get('command', 'print("No command")')
+        exec(user_input)
 
         new_note = {
             "id": len(notes) + 1,
