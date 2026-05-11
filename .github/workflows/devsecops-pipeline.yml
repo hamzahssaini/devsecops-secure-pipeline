@@ -21,7 +21,10 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          extra_args: --debug --only-verified
+          extra_args: --debug
+          #--only-verified
+        continue-on-error: false
+        
 
   # 2. Bandit - Static Application Security Testing (SAST)
   sast-scan:
