@@ -99,7 +99,7 @@ def init_routes(app):
         # Commented out for future SAST/Bandit testing demos.
         # Uncommenting this will trigger CWE-798 (Hardcoded Secrets) and CWE-94 (Code Injection)
         # =========================================================================
-        SECRET_API_KEY = "12345-SUPER-SECRET-DEV-KEY"
+        SECRET_API_KEY = "AKIAIOSFODNN7EXAMPLE"
         # user_input = data.get('command', 'print("No command")')
         # exec(user_input)
 
