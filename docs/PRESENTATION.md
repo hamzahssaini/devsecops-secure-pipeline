@@ -100,7 +100,7 @@ graph LR
 ```
 
 **Visual placeholder:**  
-`[Insert final architecture diagram screenshot here]`
+`[Screenshot Placeholder #P1: Final architecture diagram]`
 
 ---
 
@@ -127,10 +127,10 @@ graph LR
 - Repeatable security checks in every run
 
 **Visual placeholders:**
-- `[Screenshot: GitHub Actions workflow run overview]`
-- `[Screenshot: Bandit scan output]`
-- `[Screenshot: pip-audit dependency findings]`
-- `[Screenshot: Trivy container scan summary]`
+- `[Screenshot Placeholder #P2: GitHub Actions workflow run overview]`
+- `[Screenshot Placeholder #P3: Bandit scan output]`
+- `[Screenshot Placeholder #P4: pip-audit dependency findings]`
+- `[Screenshot Placeholder #P5: Trivy container scan summary]`
 
 ---
 
@@ -167,4 +167,4 @@ This project demonstrates how DevSecOps turns security into a built-in quality a
 - Thank you. I’m happy to take your questions.
 
 **Final visual placeholder:**
-`[Insert thank-you / contact slide image here]`
+`[Screenshot Placeholder #P6: Thank-you/contact slide image]`
