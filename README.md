@@ -1,64 +1,111 @@
-# Enterprise DevSecOps Pipeline Architecture 🛡️
+# Enterprise DevSecOps Secure Pipeline
 
-![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=githubactions)
 ![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
-![Security](https://img.shields.io/badge/Security-A+-success?style=for-the-badge&logo=security)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)
+![Flask](https://img.shields.io/badge/Framework-Flask-black?style=for-the-badge&logo=flask)
+![Docker](https://img.shields.io/badge/Container-Docker-2496ED?style=for-the-badge&logo=docker)
+![Security](https://img.shields.io/badge/Security-Shift--Left-success?style=for-the-badge&logo=github)
 
-## Executive Summary
-This repository serves as a comprehensive demonstration of a modern **Enterprise DevSecOps Pipeline**. It showcases the practical implementation of the "Shift-Left" security philosophy by integrating rigorous automated security checks directly into the Continuous Integration and Continuous Deployment (CI/CD) workflow. 
+A clean, practical DevSecOps demo project showing how to enforce security gates in CI/CD for a Python/Flask application.
 
-By enforcing strict quality and security gates, this pipeline ensures that no secrets, vulnerable code, or insecure dependencies reach production.
+## Why this repository exists
 
----
+This project demonstrates how to integrate security directly into development workflows so insecure code, vulnerable dependencies, and risky container images are blocked before deployment.
 
-## 🏗️ Pipeline Architecture
+## Pipeline architecture
 
-The pipeline is orchestrated via **GitHub Actions** and enforces mandatory verification across four critical security domains:
+The CI pipeline is implemented with GitHub Actions and follows an ordered, fail-fast security flow.
 
-\\mermaid
+```mermaid
 graph LR
-    A[Developer Commits] --> B{Push Protection}
-    B -->|Blocked| Z[Secret Detected]
-    B -->|Passed| C(GitHub Actions CI)
-    
-    subalign CI Pipeline
-    C --> D[1. Secret Scanning<br>TruffleHog]
-    D --> E[2. SAST<br>Bandit]
-    E --> F[3. SCA<br>pip-audit]
-    F --> G[4. Container Scan<br>Trivy]
-    end
-    
-    G --> H((Secure Deploy))
-\
----
+    A[Code Push / Pull Request] --> B[Secret Scan<br/>TruffleHog]
+    B --> C[SAST<br/>Bandit]
+    C --> D[SCA<br/>pip-audit]
+    D --> E[Container Build + Scan<br/>Docker + Trivy]
+    E --> F[Deploy-Ready Artifact]
+```
 
-## ⚙️ Security Integration Matrix
+## Security gates
 
-| Stage | Security Tool | Purpose | Threat Mitigated (CWE/OWASP) |
+| Stage | Tool | Purpose | Fails Pipeline On |
 |---|---|---|---|
-| **Pre-Commit** | *GitHub Push Protection* | Blocks active tokens from remote history | Sensitive Data Exposure |
-| **1. Secret Scan** | **TruffleHog** | Deep repository scan for hardcoded credentials | CWE-798: Hardcoded Credentials |
-| **2. SAST** | **Bandit** | Static analysis of Python AST | CWE-605, CWE-94 (Insecure Coding) |
-| **3. SCA** | **pip-audit** | Software Composition Analysis | OWASP A06: Vulnerable Components |
-| **4. Image Scan** | **Trivy** | Evaluates Docker image OS layers | Zero-day Infrastructure Vulnerabilities |
+| Secret scanning | TruffleHog | Detect leaked tokens/credentials | Verified secret findings |
+| SAST | Bandit | Detect insecure code patterns | Actionable security findings |
+| SCA | pip-audit | Detect vulnerable Python dependencies | Known unresolved vulnerabilities |
+| Container security | Trivy | Scan image packages/libraries | Critical vulnerabilities (configured) |
 
----
+## Project structure
 
-## 🚀 Demonstration Guide
+```text
+.
+├── app/
+│   ├── main.py
+│   ├── routes.py
+│   └── templates/
+├── .github/workflows/devsecops-pipeline.yml
+├── Dockerfile
+├── requirements.txt
+└── docs/
+```
 
-This repository contains intentional flaws commented out to demonstrate the efficacy of the pipeline. To experience the security gates in action:
+## Quick start
 
-1. **Test Secret Scanning (TruffleHog):** 
-   Uncomment the \DATABASE_URL\ string containing a credential in \pp/routes.py\.
-2. **Test SAST (Bandit):** 
-   Remove the \# nosec B104\ directive from the Flask \pp.run\ command in \pp/main.py\.
-3. **Test SCA (pip-audit):** 
-   Add equests==2.19.0\ to equirements.txt\.
+### Run locally
 
----
+```bash
+pip install -r requirements.txt
+python app/main.py
+```
 
-## 📊 Comprehensive Documentation
-For a deep dive into the business value, ROI, and technical specifics of this DevSecOps implementation, please refer to our internal documentation:
-* [📖 High-Level Technical Report](docs/REPORT.md)
-* [📊 Executive Presentation Deck](docs/PRESENTATION.md)
+The app will be available at: `http://localhost:5000`
+
+### Run with Docker
+
+```bash
+docker build -t devsecops-demo-api:latest .
+docker run --rm -p 5000:5000 devsecops-demo-api:latest
+```
+
+## CI workflow
+
+Workflow file: `.github/workflows/devsecops-pipeline.yml`
+
+Triggers:
+- Push to `main`
+- Pull request to `main`
+
+Execution order:
+1. Secret Scanning (TruffleHog)
+2. SAST Scan (Bandit)
+3. SCA Scan (pip-audit)
+4. Container Scan (Trivy)
+
+Each stage depends on the previous one and stops the pipeline on failure.
+
+## Demo scenarios
+
+To observe the security gates in action, introduce a controlled insecure change and push it:
+
+1. **Secret detection demo**  
+   Add a fake secret pattern in code and observe TruffleHog fail.
+2. **SAST demo**  
+   Introduce an insecure coding pattern in `app/` and observe Bandit fail.
+3. **Dependency vulnerability demo**  
+   Add a known vulnerable package version to `requirements.txt` and observe pip-audit fail.
+
+Then remediate and re-run the pipeline to confirm a clean pass.
+
+## Additional documentation
+
+- [Technical Report](docs/REPORT.md)
+- [Presentation Deck](docs/PRESENTATION.md)
+
+## Tech stack
+
+- Python 3.11
+- Flask
+- GitHub Actions
+- TruffleHog
+- Bandit
+- pip-audit
+- Docker
+- Trivy
