@@ -88,7 +88,7 @@ To observe the security gates in action, introduce a controlled insecure change 
 > ⚠️ Use these examples only in a temporary demo branch, and remove them immediately after testing.
 
 1. **Secret detection demo**  
-   In `app/routes.py`, add a temporary line like `DEMO_API_KEY = "fake_demo_token_for_testing"` and push to trigger TruffleHog.
+   In `app/routes.py`, add a temporary line like `DEMO_AWS_KEY = "AKIAIOSFODNN7EXAMPLE"` (AWS docs example format) and push to trigger TruffleHog pattern detection.
 2. **SAST demo**  
    In `app/routes.py`, add a temporary unsafe statement such as `exec(user_input)` to trigger Bandit findings.
 3. **Dependency vulnerability demo**  
