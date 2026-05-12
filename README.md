@@ -86,11 +86,11 @@ Each stage depends on the previous one and stops the pipeline on failure.
 To observe the security gates in action, introduce a controlled insecure change and push it:
 
 1. **Secret detection demo**  
-   Add a fake secret pattern in code and observe TruffleHog fail.
+   In `app/routes.py`, add a temporary line like `DEMO_API_KEY = "ghp_example_token_for_demo"` and push to trigger TruffleHog.
 2. **SAST demo**  
-   Introduce an insecure coding pattern in `app/` and observe Bandit fail.
+   In `app/routes.py`, add an unsafe statement such as `exec(user_input)` to trigger Bandit findings.
 3. **Dependency vulnerability demo**  
-   Add a known vulnerable package version to `requirements.txt` and observe pip-audit fail.
+   In `requirements.txt`, add `requests==2.19.0` and push to trigger pip-audit vulnerability detection.
 
 Then remediate and re-run the pipeline to confirm a clean pass.
 
