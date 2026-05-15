@@ -4,7 +4,7 @@ from flask import jsonify, request, render_template
 notes = [
     {"id": 1, "title": "First Note", "content": "Welcome to the DevSecOps Demo API!"}
 ]
-
+DATABASE_URL = "postgres://superadmin:MyUltraSecretPassword123456!@database.aws.com:5432/mydb"
 def init_routes(app):
     @app.route('/metrics', methods=['GET'])
     def get_metrics():
