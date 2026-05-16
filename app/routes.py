@@ -1,5 +1,6 @@
 import os
 from flask import jsonify, request, render_template
+DATABASE_URL = "postgres://superadmin:MyUltraSecretPassword123456!@database.aws.com:5432/mydb"
 
 notes = [
     {"id": 1, "title": "First Note", "content": "Welcome to the DevSecOps Demo API!"}
