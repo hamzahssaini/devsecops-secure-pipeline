@@ -2,8 +2,8 @@ import os
 from flask import jsonify, request, render_template
 
 
-SECRET_API_KEY = "sk_test_123456789"
-API_KEY = os.getenv("API_KEY", "secure_default_or_none")
+# SECRET_API_KEY = "sk_test_123456789"
+# API_KEY = os.getenv("API_KEY", "secure_default_or_none")
 
 notes = [
     {"id": 1, "title": "First Note", "content": "Welcome to the DevSecOps Demo API!"}
